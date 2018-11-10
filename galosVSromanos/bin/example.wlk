@@ -23,7 +23,7 @@ class Persona{
 	}
 }
 
-class Pocion{
+class Posion{
 	var property ingredientes = []
 	method cantidadIngredientes(){
 		return self.ingredientes().size()
@@ -118,7 +118,33 @@ class Ejercito{
 	}
 }
 
-class Legion inherits Ejercito{
+class Legion {
 	var property formacion
 }
 
+class FormacionTortuga inherits Ejercito{
+	override method poder(){
+		return 0
+	}
+	override method recibirDanio(danio){
+		super(0)
+	}
+}
+
+class FormacionEnCuadro inherits Ejercito{
+	constructor(_cantidadAdeltante){
+		cantidadAdelante =  _cantidadAdeltante
+	}
+}
+
+class FormacionFrontemAllargate inherits Ejercito{
+	override method poder(){
+		return super() * 1.1
+	}
+	override method recibirDanio(danio){
+		super(danio*2)
+	}
+	override method cantidadAdelante(){
+		return super()/2
+	}
+}
