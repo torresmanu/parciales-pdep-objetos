@@ -5,6 +5,9 @@ class Guerrero{
 	var property energia = energiaOriginal
 	var property experiencia
 	var property traje
+	method elementosTraje(){
+		return traje.elementos()
+	}
 	method atacar(enemigo){
 		enemigo.serAtacado(self.potencialOfensivo())
 	}
@@ -38,6 +41,7 @@ class Traje{
 		}
 		else return false
 		}
+		method elementos()=1
 	}
 
 class Comun inherits Traje{
@@ -59,11 +63,14 @@ class Entrenamiento inherits Traje{
 
 class Modularizado inherits Traje{
 	const property piezas = []
+	override method elementos(){
+		return piezas.size()
+	}
 	method piezasGastadas(){
 		return piezas.filter({unaPieza => unaPieza.gastada()}).size()
 	}
 	override method aumentarExperiencia(){
-		return (piezas.size()-self.piezasGastadas())/piezas.size()
+		return (self.elementos()-self.piezasGastadas())/self.elementos()
 	}
 	method resistenciaTotal(){
 		return piezas.resistencia().sum()
@@ -105,5 +112,25 @@ class Saiyan inherits Guerrero{
 		super()
 		potencialOfensivo += potencialOriginal*0.05 
 	}
+	method volverAlOriginal(){
+		potencialOfensivo = potencialOriginal
+		energia = energiaOriginal
+		nivel = 0
+	}
+}
 
+class Dbz{
+	var property guerreros = #{}
+	method guerrerosSegun(condicion){
+		return guerreros.sortedBy(condicion).take(16)
+	}
+	method powerlsBest(){
+		return self.guerrerosSegun({guerrero=>guerrero.potencialOfensivo()})
+	}
+	method funny(){
+		return self.guerrerosSegun({guerrero=>guerrero.elementos()})
+	}
+	method surprise(){
+		return guerreros.anyOne(16)
+	}
 }
