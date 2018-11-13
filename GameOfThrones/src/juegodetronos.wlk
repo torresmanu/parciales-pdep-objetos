@@ -1,8 +1,16 @@
 class Personaje{
 	var property casa
+	var property personalidad
 	var property conyuges = #{}
 	var property acompaniantes = #{}
 	var property estaVivo = true
+	
+	method derrochar(porcentaje){
+		casa.derrochar(porcentaje)
+	}
+	method morir(){
+		estaVivo = false
+	}
 	method esPeligroso(){
 		if(!estaVivo){
 			return false
@@ -10,6 +18,9 @@ class Personaje{
 		else{
 			return self.dineroAliadosMayorQue(10000) or self.conyugesDeCasaRica() or self.aliadoConPeligroso()
 		}
+	}
+	method soltero(){
+		return self.cantidadConyuges()==0
 	}
 	method aliadoConPeligroso(){
 		return self.aliados().any({unAl=>unAl.esPeligroso()})
@@ -48,25 +59,34 @@ class Personaje{
 	method cantidadConyuges() = self.conyuges().size()
 	
 	method esTraidor(personaje){
-		return self.aliados().contains(personaje)
-	}
+		return self.aliados().find(personaje)
+}
 }
 class Casa{
 	var property patrimonio
 	var property miembros = #{}
 	var property ciudad
 	
+	method derrochar(porcentaje){
+		patrimonio -= patrimonio*porcentaje
+	}
+	method miembrosSolteros(){
+		return miembros.filter({miembro=>miembro.soltero()})
+	}
 	method cantidadMiembros(){
 		return miembros.size()
 	}
 	method esRica(){
 		return patrimonio>=1000
 	}
+	method solterosVivos(){
+		return self.miembrosSolteros().filter({miembro=>miembro.estaVivo()})
+	}
 }
 
 object lannister inherits Casa{
 	method puedenCasarse(personaje, conyuge){
-		return personaje.cantidadConyuges()==0
+		return personaje.soltero()
 	}
 }
 
@@ -93,19 +113,61 @@ class Lobo inherits Animal{
 }
 
 class Conspiracion{
-	var property objetivo
-	var property complotados
+	const property objetivo
+	const property complotados
+	var property ejecutada=false
 	
-	constructor(_personaje,_complotados){
-		if(_personaje.esPeligroso()){
-			objetivo=_personaje
-			complotados=_complotados
+	constructor(_objetivo,_complotados){
+		if(_objetivo.esPeligroso()){
+			objetivo = _objetivo
+			complotados = _complotados
 		}
-		else self.error("No se puede contruir")
+		else self.error("el objetivo no es peligroso")
 	}
-	
 	method traidores(){
-		return complotados.count({unP=>unP.esTraidor(objetivo)})
+		return complotados.count(complotado=>complotado.traidor(objetivo))
+	}
+	method ejecutar(){
+		complotados.map({complotado=>complotado.accion(objetivo)})
+		ejecutada = true
+	}
+	method objetivoCumplido(){
+		return ejecutada and !objetivo.esPeligroso()
 	}
 }
-
+class Juego{
+	var property casas
+	method casaMasPobre(){
+		return casas.min(unaCasa=>unaCasa.patrimonio)
+	}
+}
+object sutil{
+	const juego
+	method casaMasPobre(){
+		return juego.casaMasPobre()
+	}
+	method accion(objetivo){
+		objetivo.casarse(self.casaMasPobre().solterosVivos().anyOne())
+	}
+}
+object asesino{
+	method accion(objetivo){
+		objetivo.morir()
+	}
+}
+object asesinoPrecavido{
+	method accion(objetivo){
+		if(objetivo.estaSolo()){
+			objetivo.morir()
+		}
+	}
+}
+object disipados{
+	var property porcentajeDerroche
+	method accion(objetivo){
+		objetivo.derrochar()
+	}
+}
+object miedoso{
+	method accion(objetivo)
+}
