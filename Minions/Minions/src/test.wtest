@@ -1,0 +1,26 @@
+import example.*
+describe "Punto 3"{
+	const soldado = new Soldado()
+	const empleado = new Empleado()
+	var amenaza = new DefenderSector()
+
+fixture{
+	empleado.rol(soldado)
+	empleado.estamina(2)
+	amenaza.gradoAmenaza(3)
+	amenaza.dificultad(3)
+	soldado.practica(1)
+	soldado.danioExtra(1)
+	empleado.defenderSector(amenaza)
+	}
+	
+
+	test "nivel de estamina = 2" {
+		
+		assert.equals(2,empleado.estamina())
+	}
+	test "nivel de expericencia"{
+		assert.equals(3,empleado.experiencia())
+	}
+	
+}
