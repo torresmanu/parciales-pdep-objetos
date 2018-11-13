@@ -8,7 +8,13 @@ class Empleado{
 	method comerFruta(fruta){
 		estamina += fruta.valor()
 	}
-
+	
+	method experiencia(){
+		return tareasRealizadas.size()*self.dificultadTareas()
+	}
+	method dificultadTareas(){
+	 	return tareasRealizadas.sum({unaTarea=>unaTarea.dificultad()})
+	}
 	method tengoHerramientas(maquina){
 		return rol.tengoHerraminetas()
 	}
@@ -16,7 +22,6 @@ class Empleado{
 		if(maquina.dificultas()<estamina and self.tengoHerramientas(maquina) ){
 			estamina -= maquina.dificultad()
 			tareasRealizadas.add(maquina)
-			return maquina.dificultad()
 		}
 		else{
 			throw new Exception("No es posibe que este empleado arregle la maquina")
@@ -30,7 +35,6 @@ class Empleado{
 		if(self.fuerza()>amenaza.gradoAmenaza()){
 			rol.defenderSector(self)
 			tareasRealizadas.add(amenaza)
-			return amenaza.dificultad()
 		}
 		else throw new Exception("no tiene suficiente fuerza")
 	}
@@ -40,7 +44,9 @@ class Empleado{
 	method limpiarSector(sector){
 		if(rol.puedoLimpiar(self,sector)){
 			rol.limpiarSector(self,sector)
+			tareasRealizadas.add(sector)
 		}
+		else throw new Exception ("no puede limpiar el sector") 
 		
 	}
 }
@@ -55,19 +61,18 @@ object uva{
 }
 
 class Tarea{
-	method dificultad()
+
 }
 class ArreglarMaquina inherits Tarea{
 	var property complejidad
 	const property herraminetasRequeridas = #{}
-	override method dificultad(){
-		return complejidad*2
-	}
+	var property dificultad=complejidad*2
 }
 class DefenderSector inherits Tarea{
 	const property gradoAmenaza
-	override method dificultad(){
-		return gradoAmenaza
+	var property dificultad = gradoAmenaza
+	method aumentarDificultad(aumento){
+		dificultad = dificultad*aumento
 	}
 }
 class LimpiarSector inherits Tarea{
@@ -82,14 +87,15 @@ class LimpiarSector inherits Tarea{
 }
 
 
-
-
 class Biclopes inherits Empleado{
 
 }
 class Ciclopes inherits Empleado{
 	override method fuerza(){
-		return super()*2
+		return super()/2
+	}
+	override method defenderSector(sector){
+		sector.aumentarDificultad(2)
 	}
 }
 
